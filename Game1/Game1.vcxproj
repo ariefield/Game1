@@ -128,7 +128,6 @@
     <ClCompile Include="StaticMethods.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FragmentShader2.glsl" />
     <ClInclude Include="MainGame.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="StaticMethods.h" />

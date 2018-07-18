@@ -38,9 +38,6 @@
     <ClInclude Include="Sprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FragmentShader2.glsl">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
     <ClInclude Include="StaticMethods.h">
       <Filter>Services</Filter>
     </ClInclude>
