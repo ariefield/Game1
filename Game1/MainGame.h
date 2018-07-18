@@ -19,25 +19,27 @@ class MainGame
 		void initSystems();
 		void gameLoop();
 		void processInput();
-		void drawGame();
+		void update();
+		void render();
 
 		//Variables
-		SDL_Window * _window;
-		int _screenWidth;
-		int _screenHeight;
-		GameState _gameState;
+		SDL_Window * window;
+		int screenWidth;
+		int screenHeight;
+		GameState gameState;
+		Uint32 frameStart;
+		int frameTime;
+
 		//Vars to be moved elsewhere
-		GLuint _VAOs[2];
-		GLuint _VBOs[2];
-		GLuint _EBO;
-		GLuint _vertexShader;
-		GLuint _fragmentShader1;
-		GLuint _fragmentShader2;
-		GLuint _shaderProgram1;
-		GLuint _shaderProgram2;
+		GLuint VAOs[2];
+		GLuint VBOs[2];
+		GLuint vertexShader;
+		GLuint fragmentShader;
+		GLuint shaderProgram;
 		//Vars for testing
 		float x1;
 		float y1;
+		float colorValue;
 
 };
 

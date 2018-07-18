@@ -1,11 +1,12 @@
 #include <iostream>
 #include "MainGame.h"
 
+MainGame *game = nullptr;
 
 int main(int argc, char** argv) 
 {
-	MainGame mainGame;
-	mainGame.run();
+	game = new MainGame();
+	game->run();
 
 	return 0;
 }

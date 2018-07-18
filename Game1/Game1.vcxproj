@@ -125,10 +125,17 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainGame.cpp" />
     <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="StaticMethods.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FragmentShader2.glsl" />
     <ClInclude Include="MainGame.h" />
     <ClInclude Include="Sprite.h" />
+    <ClInclude Include="StaticMethods.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FragmentShader.glsl" />
+    <None Include="VertexShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
