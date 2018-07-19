@@ -27,8 +27,6 @@ class MainGame
 		int screenWidth;
 		int screenHeight;
 		GameState gameState;
-		Uint32 frameStart;
-		int frameTime;
 
 		//Vars to be moved elsewhere
 		GLuint VAOs[2];

@@ -5,10 +5,6 @@
 #include <fstream>
 #include <string>
 
-//Game related consts
-const int FPS = 60;
-const int FRAME_DELAY = 1000 / FPS;
-
 //Define shader file paths
 const char *VERTEX_PATH = "VertexShader.glsl";
 const char *FRAGMENT_PATH = "FragmentShader.glsl";
@@ -26,8 +22,6 @@ MainGame::MainGame()
 	screenWidth = 1024;
 	screenHeight = 768;
 	gameState = GameState::PLAY;
-	frameStart = 0;
-	frameTime = 0;
 
 	//Move elsewhere
 	vertexShader = 0;
@@ -70,6 +64,7 @@ void MainGame::initSystems()
 
 	//Initialize SDL/glew/GL
 	SDL_Init(SDL_INIT_EVERYTHING);
+	glewInit();
 
 	window = SDL_CreateWindow("Game_Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 	if (window == nullptr)
@@ -79,22 +74,14 @@ void MainGame::initSystems()
 
 	SDL_GLContext glContext = SDL_GL_CreateContext(window);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
 	//int SDL_GL_SetSwapInterval(int interval);
-
-	glewInit();
-
-	//Clear screen to black
-	glClearDepth(1.0);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Create and bind VAO1
 	glGenVertexArrays(1, VAOs);
 	glBindVertexArray(VAOs[0]);
 
 	// Load vertex data into buffer
-	glGenBuffers(1, VBOs);							//Assign value to VBO
+	glGenBuffers(1, VBOs);						//Assign value to VBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);		//Set VBO as the buffer to work with
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);
 
@@ -107,41 +94,22 @@ void MainGame::initSystems()
 	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
 	glCompileShader(vertexShader);
 
-	//Check if shader compiled properly
-	int success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		printf("ERROR::SHADER::VERTEX:COMPILATION_FAILED\n%s", infoLog);
-	}
-
 	//Set up fragment shader and compile
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
 	glCompileShader(fragmentShader);
 
-	//Check if shader compiled properly
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		printf("ERROR::SHADER::FRAGMENT:COMPILATION_FAILED\n%s", infoLog);
-	}
+	//Check if shaders compiled properly
+	StaticMethods::checkShaderCompiled(fragmentShader);
+	StaticMethods::checkShaderCompiled(vertexShader);
 
-	//Create shader program 1
+	//Create shader program
 	shaderProgram = glCreateProgram();
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
 	glLinkProgram(shaderProgram);
 
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		printf("ERROR::PROGRAM::COMPILATION_FAILED\n%s", infoLog);
-	}
+	StaticMethods::checkProgramCompiled(shaderProgram);
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
@@ -149,20 +117,34 @@ void MainGame::initSystems()
 
 void MainGame::gameLoop()
 {
+	//TODO: de-couple simulation/display framerate -------------------
+	//Set up display-related values
+	const int DISPLAY_FPS = 60;
+	const int MAX_DISPLAY_TIME = 1000 / DISPLAY_FPS;
+	Uint32 frameStartTime = SDL_GetTicks();
+	int currentFrameTime = 0;
+
 	while (gameState != GameState::EXIT)
 	{
-		//TODO: decouple display framerate and simulation framerate -----------------------------------------------
-		frameStart = SDL_GetTicks();
+		frameStartTime = SDL_GetTicks();
 
 		processInput();
 		update();
 		render();
 
-		frameTime = SDL_GetTicks() - frameStart;
+		currentFrameTime = SDL_GetTicks() - frameStartTime;
 
-		if (frameTime < FRAME_DELAY)
+		if (currentFrameTime < MAX_DISPLAY_TIME)
 		{
-			SDL_Delay(FRAME_DELAY - frameTime);
+			SDL_Delay(MAX_DISPLAY_TIME - currentFrameTime);
+			while (currentFrameTime < MAX_DISPLAY_TIME)
+			{
+				currentFrameTime = SDL_GetTicks() - frameStartTime;
+			}
+		}
+		else
+		{
+			printf("Game took %d milliseconds too long to render\n", currentFrameTime - MAX_DISPLAY_TIME );
 		}
 	}
 
