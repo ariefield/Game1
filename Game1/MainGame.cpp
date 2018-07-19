@@ -6,10 +6,10 @@ const char *FRAGMENT_PATH = "FragmentShader.fs";
 
 //Define vertices
 const float vertices[] = {
-	// positions         // colors
-	0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
-	-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
-	0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
+	// positions        // colors
+	0.5f, -0.5f, 0.0f,  1.0f, 0.5f, 0.0f,  // bottom right
+	-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,  // bottom left
+	0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top 
 };
 
 MainGame::MainGame()
@@ -48,7 +48,7 @@ void MainGame::run()
 
 void MainGame::initSystems()
 {
-	//Initialize SDL-related objects
+	// -- Initialize SDL related objects
 	SDL_Init(SDL_INIT_EVERYTHING);
 	window = SDL_CreateWindow("Game1", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 	if (window == nullptr)
@@ -58,7 +58,7 @@ void MainGame::initSystems()
 	SDL_GLContext glContext = SDL_GL_CreateContext(window);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-	//Initialize OpenGL related objects
+	// -- Initialize OpenGL related objects
 	glewInit();
 	shader = new Shader(VERTEX_PATH, FRAGMENT_PATH);
 
@@ -82,7 +82,7 @@ void MainGame::initSystems()
 
 void MainGame::gameLoop()
 {
-	//TODO: de-couple simulation/display framerate -------------------
+	//TODO: De-couple simulation/display framerate -------------------
 	//Set up display-related values
 	const int DISPLAY_FPS = 60;
 	const int MAX_DISPLAY_TIME = 1000 / DISPLAY_FPS;

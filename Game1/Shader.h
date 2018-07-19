@@ -15,15 +15,16 @@
 class Shader
 {
 public:
+	// -- Variables
 	//Program ID
 	GLuint ID;
 
-	//Methods
+	// -- Methods
 	Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
 	~Shader();
-	//Use/activate the shader
+	//Activate the shader
 	void use();
-	//Utility uniform functions
+	//Uniform-setting functions
 	void setBool(const std::string &name, bool value) const;
 	void setInt(const std::string &name, int value) const;
 	void setFloat(const std::string &name, float value) const;
