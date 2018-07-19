@@ -1,32 +1,27 @@
 #include "MainGame.h"
-#include "StaticMethods.h"
-
-#include <iostream>
-#include <fstream>
-#include <string>
 
 //Define shader file paths
-const char *VERTEX_PATH = "VertexShader.glsl";
-const char *FRAGMENT_PATH = "FragmentShader.glsl";
+const char *VERTEX_PATH = "VertexShader.vs";
+const char *FRAGMENT_PATH = "FragmentShader.fs";
 
-//Define vertices of 2 triangles
-const float vertices1[] = {
-	-0.5f, -0.5f, 0.0f,		//bottom left	
-	0.0f, 0.5f, 0.0f,		//top		
-	0.5f, -0.5f, 0.0f,		//bottom right			
+//Define vertices
+const float vertices[] = {
+	// positions         // colors
+	0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+	-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
+	0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
 };
 
 MainGame::MainGame()
 {
+	//SDL
 	window = nullptr;
 	screenWidth = 1024;
 	screenHeight = 768;
 	gameState = GameState::PLAY;
 
-	//Move elsewhere
-	vertexShader = 0;
-	fragmentShader = 0;
-	shaderProgram = 0;
+	//OpenGL
+	shader = nullptr;
 	for (int i = 0; i < sizeof(VAOs); i++)
 	{
 		VAOs[i] = 0;
@@ -39,43 +34,33 @@ MainGame::MainGame()
 	//Testing
 	x1 = -0;
 	y1 = 0.5;
-	colorValue = 0;
 }
 
 MainGame::~MainGame()
 {
 }
 
-
 void MainGame::run()
 {
 	initSystems();
-
 	gameLoop();
 }
 
 void MainGame::initSystems()
 {
-	//Load shaders into memory
-	std::string vertShaderStr = StaticMethods::readFile(VERTEX_PATH);
-	std::string fragShaderStr = StaticMethods::readFile(FRAGMENT_PATH);
-	const char *vertexShaderSource = vertShaderStr.c_str();
-	const char *fragmentShaderSource = fragShaderStr.c_str();
-
-	//Initialize SDL/glew/GL
+	//Initialize SDL-related objects
 	SDL_Init(SDL_INIT_EVERYTHING);
-
-	window = SDL_CreateWindow("Game_Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Game1", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 	if (window == nullptr)
 	{
 		StaticMethods::fatalError("SDL window could not be created");
 	}
-
 	SDL_GLContext glContext = SDL_GL_CreateContext(window);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	//int SDL_GL_SetSwapInterval(int interval);
 
+	//Initialize OpenGL related objects
 	glewInit();
+	shader = new Shader(VERTEX_PATH, FRAGMENT_PATH);
 
 	//Create and bind VAO1
 	glGenVertexArrays(1, VAOs);
@@ -84,36 +69,15 @@ void MainGame::initSystems()
 	// Load vertex data into buffer
 	glGenBuffers(1, VBOs);						//Assign value to VBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);		//Set VBO as the buffer to work with
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	//Tell the vertex shader how to interpret buffer data
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	//Tell the vertex shader how to interpret buffer position data
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	//Set up vertex shader and compile
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-
-	//Set up fragment shader and compile
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-
-	//Check if shaders compiled properly
-	StaticMethods::checkShaderCompiled(fragmentShader);
-	StaticMethods::checkShaderCompiled(vertexShader);
-
-	//Create shader program
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	StaticMethods::checkProgramCompiled(shaderProgram);
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	//Tell the vertex shader how to interpret buffer color data
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 }
 
 void MainGame::gameLoop()
@@ -149,7 +113,7 @@ void MainGame::gameLoop()
 		}
 	}
 
-	// de-allocate 
+	// De-allocate after game is exited
 	glDeleteVertexArrays(1, VAOs);
 	glDeleteBuffers(1, VBOs);
 }
@@ -176,20 +140,17 @@ void MainGame::processInput()
 
 void MainGame::update()
 {
-	colorValue += 0.02;
-	float greenValue = (sin(colorValue) / 2.0f) + 0.5f;
-	int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-	glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
 }
 
 void MainGame::render()
 {
-	//GL calls
+	//Clear screen
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glUseProgram(shaderProgram);
-
+	//Draw triangle
+	shader->use();
 	glBindVertexArray(VAOs[0]);	
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 

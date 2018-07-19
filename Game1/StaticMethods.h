@@ -2,6 +2,7 @@
 #include <SDL\SDL.h>
 #include <GL\glew.h>
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <string>
 
@@ -15,5 +16,6 @@ public:
 	static void checkProgramCompiled(unsigned int shader);
 	static void checkShaderCompiled(unsigned int shader);
 	static std::string readFile(const char *filePath);
+	static std::string readFileDeprecated(const char *filePath);
 };
 

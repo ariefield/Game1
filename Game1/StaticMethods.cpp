@@ -47,6 +47,32 @@ void StaticMethods::checkShaderCompiled(unsigned int shader)
 
 std::string StaticMethods::readFile(const char * filePath)
 {
+	std::string codeAsString;
+	std::ifstream file;
+	// ensure ifstream objects can throw exceptions:
+	file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	try
+	{
+		// open files
+		file.open(filePath);
+		std::stringstream stream;
+		// read file's buffer contents into stream
+		stream << file.rdbuf();
+		// close file handlers
+		file.close();
+		// convert stream into string
+		codeAsString = stream.str();
+	}
+	catch (std::ifstream::failure e)
+	{
+		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+	}
+
+	return codeAsString;
+}
+
+std::string StaticMethods::readFileDeprecated(const char * filePath)
+{
 	std::string content;
 	std::ifstream fileStream(filePath, std::ios::in);
 
@@ -64,3 +90,4 @@ std::string StaticMethods::readFile(const char * filePath)
 	fileStream.close();
 	return content;
 }
+
