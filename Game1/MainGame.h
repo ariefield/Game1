@@ -36,6 +36,8 @@ private:
 	//Testing
 	float x1;
 	float y1;
+	float offset;
+	bool right;
 
 
 	//Methods

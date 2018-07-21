@@ -7,9 +7,9 @@ const char *FRAGMENT_PATH = "FragmentShader.fs";
 //Define vertices
 const float vertices[] = {
 	// positions        // colors
-	0.5f, -0.5f, 0.0f,  1.0f, 0.5f, 0.0f,  // bottom right
-	-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,  // bottom left
-	0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top 
+	0.0f, -0.5f, 0.0f,  1.0f, 0.5f, 0.0f,  // bottom right
+	-1.0f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,  // bottom left
+	-0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f  // top
 };
 
 MainGame::MainGame()
@@ -34,6 +34,8 @@ MainGame::MainGame()
 	//Testing
 	x1 = -0;
 	y1 = 0.5;
+	offset = 0;
+	right = true;
 }
 
 MainGame::~MainGame()
@@ -140,7 +142,17 @@ void MainGame::processInput()
 
 void MainGame::update()
 {
+	if (offset >= 1.0)
+		right = false;
+	else if (offset < 0)
+		right = true;
 
+	if (right)
+		offset += 0.02;
+	else
+		offset -= 0.02;
+
+	shader->setFloat("offset", offset);
 }
 
 void MainGame::render()
