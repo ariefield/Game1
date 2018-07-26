@@ -13,8 +13,6 @@ public:
 	~StaticMethods();
 
 	static void fatalError(std::string errorString);
-	static void checkProgramCompiled(unsigned int shader);
-	static void checkShaderCompiled(unsigned int shader);
 	static std::string readFile(const char *filePath);
 	static std::string readFileDeprecated(const char *filePath);
 };

@@ -21,15 +21,15 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
 	glCompileShader(fragmentShader);
 
 	//Check if shaders compiled properly
-	StaticMethods::checkShaderCompiled(fragmentShader);
-	StaticMethods::checkShaderCompiled(vertexShader);
+	checkShaderCompiled(fragmentShader);
+	checkShaderCompiled(vertexShader);
 
 	//Create shader program
 	ID = glCreateProgram();
 	glAttachShader(ID, vertexShader);
 	glAttachShader(ID, fragmentShader);
 	glLinkProgram(ID);
-	StaticMethods::checkProgramCompiled(ID);
+	checkProgramCompiled(ID);
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
@@ -37,6 +37,30 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
 
 Shader::~Shader()
 {
+}
+
+void Shader::checkProgramCompiled(unsigned int shader)
+{
+	int success;
+	char infoLog[512];
+	glGetProgramiv(shader, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetProgramInfoLog(shader, 512, NULL, infoLog);
+		printf("ERROR::PROGRAM::COMPILATION_FAILED\n%s", infoLog);
+	}
+}
+
+void Shader::checkShaderCompiled(unsigned int shader)
+{
+	int success;
+	char infoLog[512];
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(shader, 512, NULL, infoLog);
+		printf("ERROR::SHADER::COMPILATION_FAILED\n%s", infoLog);
+	}
 }
 
 void Shader::use()

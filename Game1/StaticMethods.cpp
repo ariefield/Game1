@@ -21,30 +21,6 @@ void StaticMethods::fatalError(std::string errorString)
 	exit(1);
 }
 
-void StaticMethods::checkProgramCompiled(unsigned int shader)
-{
-	int success;
-	char infoLog[512];
-	glGetProgramiv(shader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(shader, 512, NULL, infoLog);
-		printf("ERROR::PROGRAM::COMPILATION_FAILED\n%s", infoLog);
-	}
-}
-
-void StaticMethods::checkShaderCompiled(unsigned int shader)
-{
-	int success;
-	char infoLog[512];
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		printf("ERROR::SHADER::COMPILATION_FAILED\n%s", infoLog);
-	}
-}
-
 std::string StaticMethods::readFile(const char * filePath)
 {
 	std::string codeAsString;

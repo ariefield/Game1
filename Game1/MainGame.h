@@ -5,6 +5,8 @@
 #include <SDL\SDL.h>
 #include <GL\glew.h>
 
+#include "stb_image.h"
+
 #include "Shader.h"
 #include "StaticMethods.h"
 
@@ -36,15 +38,19 @@ private:
 	//Testing
 	float x1;
 	float y1;
-	float offset;
+	float offsetX;
+	float offsetY;
+	//Move these elsewhere later
+	bool up;
+	bool down;
+	bool left; 
 	bool right;
-
 
 	//Methods
 	void initSystems();
 	void gameLoop();
 	void processInput();
-	void update();
+	void update(double time);
 	void render();
 };
 
