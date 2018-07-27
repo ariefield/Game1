@@ -144,7 +144,6 @@ void MainGame::gameLoop()
 		{
 			while (elapsedFrameTime < MAX_DISPLAY_TIME)
 			{
-				printf("Counter: %d	 ||  startCycles: %d  ||  perfHz: %d\n", SDL_GetPerformanceCounter(), frameStartCycles, SDL_GetPerformanceFrequency());
 				elapsedFrameTime = 1000.0 * (double)(SDL_GetPerformanceCounter() - frameStartCycles) / SDL_GetPerformanceFrequency();
 			}
 		}
@@ -156,7 +155,7 @@ void MainGame::gameLoop()
 		render();
 
 		time += elapsedFrameTime;
-		printf("After loop:%f\n", elapsedFrameTime);
+		printf("Elapsed Time:%f\n", elapsedFrameTime);
 	}
 
 	// De-allocate after game is exited
